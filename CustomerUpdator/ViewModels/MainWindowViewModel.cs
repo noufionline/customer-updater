@@ -21,7 +21,8 @@ namespace CustomerUpdator.ViewModels
     public class MainWindowViewModel : BindableBase
     {
         private readonly IMapper _mapper;
-        private List<SunSystemCustomer> _sunCustomerCollection;
+        private readonly List<SunSystemCustomer> _sunCustomerCollection;
+        private readonly List<SunAccount> _odooSunAccounts;
 
         public MainWindowViewModel(IMapper mapper)
         {
@@ -36,6 +37,9 @@ namespace CustomerUpdator.ViewModels
 
                 _sunCustomerCollection = db.SunSystemCustomers.ToList();
                 _sunCustomerCollection.ForEach(x=> x.VatCode=x.VatCode.Replace(" ",""));
+
+
+                _odooSunAccounts = GetSunAccounts();
             }
         }
 
@@ -62,8 +66,9 @@ namespace CustomerUpdator.ViewModels
 
         public ObservableCollection<PartnerModel> Partners { get; set; }
 
-        public ObservableCollection<SunSystemCustomer> SunCustomers { get; set; } =
-            new ObservableCollection<SunSystemCustomer>();
+        public ObservableCollection<SunSystemCustomer> SunCustomers { get; set; } = new ObservableCollection<SunSystemCustomer>();
+        public ObservableCollection<SunAccount> OdooCustomers { get; set; } = new ObservableCollection<SunAccount>();
+            
 
         #region SelectCommand
 
@@ -81,6 +86,18 @@ namespace CustomerUpdator.ViewModels
                 SunCustomers.Clear();
                 SunCustomers = new ObservableCollection<SunSystemCustomer>(_sunCustomerCollection
                     .Where(x => x.VatCode.Trim() == partner.TaxRegistrationNo.Trim()).ToList());
+
+                var sunCodes = SunCustomers.Select(x => x.Code.Trim()).ToArray();
+                OdooCustomers = new ObservableCollection<SunAccount>(_odooSunAccounts.Where(x => sunCodes.Contains(x.SunAccountCode)).ToList());
+
+                foreach (var customer in SunCustomers)
+                {
+                    if (OdooCustomers.Any(x => x.SunAccountCode == customer.Code.Trim() && x.IsProject))
+                    {
+                        customer.IsProject = true;
+                    }
+                }
+
             }
             catch (Exception exception)
             {

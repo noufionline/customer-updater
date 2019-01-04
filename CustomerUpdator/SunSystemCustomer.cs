@@ -128,5 +128,8 @@ namespace CustomerUpdator
 
         [StringLength(255)]
         public string VatCode { get; set; }
+
+        [NotMapped]
+        public bool IsProject { get; set; }
     }
 }

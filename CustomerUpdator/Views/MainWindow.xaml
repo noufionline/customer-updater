@@ -76,7 +76,8 @@
                     </dxlc:LayoutGroup>
                 </dxlc:LayoutGroup>
                    <dxlc:LayoutGroup Header="LayoutGroup" View="Tabs">
-                        <dxlc:LayoutGroup Header="Sun System Customers" >
+                   <dxlc:LayoutGroup Header="Customers and Projects">
+                         <dxlc:LayoutGroup Header="Sun System Customers" View="GroupBox">
                             <dxg:GridControl MaxHeight="400"  ItemsSource="{Binding SunCustomers}">
                                 <dxg:GridControl.View>
                                     <dxg:TableView ShowGroupPanel="False" AutoWidth="True" AllowEditing="False" ShowAutoFilterRow="True" ShowCriteriaInAutoFilterRow="True" />
@@ -85,20 +86,25 @@
                                 <dxg:GridColumn FieldName="Name" Width="250" FixedWidth="True"/>
                                 <dxg:GridColumn FieldName="VatCode" Width="150" FixedWidth="True"/>
                                 <dxg:GridColumn FieldName="Address"/>
+                                <dxg:GridColumn FieldName="IsProject"/>
                             </dxg:GridControl>
                         </dxlc:LayoutGroup>
-                       <dxlc:LayoutGroup Header="Odoo Customers">
+                        <dxlc:LayoutGroup Header="Odoo Customers" View="GroupBox">
                            <dxg:GridControl MaxHeight="400"  ItemsSource="{Binding OdooCustomers}">
                                <dxg:GridControl.View>
                                    <dxg:TableView ShowGroupPanel="False" AutoWidth="True" AllowEditing="False" ShowAutoFilterRow="True" ShowCriteriaInAutoFilterRow="True" />
                                </dxg:GridControl.View>
-                               <dxg:GridColumn FieldName="Code" Width="100" FixedWidth="True"/>
-                               <dxg:GridColumn FieldName="Name" Width="250" FixedWidth="True"/>
-                               <dxg:GridColumn FieldName="VatCode" Width="150" FixedWidth="True"/>
-                               <dxg:GridColumn FieldName="Address"/>
+                               <dxg:GridColumn FieldName="PartnerId" Width="100" FixedWidth="True"/>
+                               <dxg:GridColumn FieldName="PartnerName" Width="250" FixedWidth="True"/>  
+                               <dxg:GridColumn FieldName="ProjectId" Width="100" FixedWidth="True"/>
+                               <dxg:GridColumn FieldName="ProjectName" Width="250" FixedWidth="True"/>
+                               <dxg:GridColumn FieldName="SunAccountCode" Width="150" FixedWidth="True"/>
+                               <dxg:GridColumn FieldName="IsProject"/>
                            </dxg:GridControl>
                        </dxlc:LayoutGroup>
-                   
+                   </dxlc:LayoutGroup>   
+                   <dxlc:LayoutGroup Header="Tasks"></dxlc:LayoutGroup>
+                   <dxlc:LayoutGroup Header="Logs and Messages"></dxlc:LayoutGroup>
                 </dxlc:LayoutGroup>
 
                 </dxlc:LayoutGroup>
