@@ -3,6 +3,8 @@ using Prism.Ioc;
 using Prism.Modularity;
 using System.Windows;
 using AutoMapper;
+using CustomerUpdator.Contracts;
+using CustomerUpdator.Services;
 using CustomerUpdator.ViewModels;
 
 namespace CustomerUpdator
@@ -23,6 +25,8 @@ namespace CustomerUpdator
             containerRegistry.RegisterForNavigation<CustomerMapperView>();
             containerRegistry.RegisterForNavigation<SunAccountDetailView>();
             containerRegistry.Register(typeof(IPartnerService),typeof(PartnerService));
+            containerRegistry.Register(typeof(IOdooService),typeof(OdooService));
+            containerRegistry.Register(typeof(ISunSystemService),typeof(SunSystemService));
 
             var mapperConfiguration = new MapperConfiguration(config =>
             {

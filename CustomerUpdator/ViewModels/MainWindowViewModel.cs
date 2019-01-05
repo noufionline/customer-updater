@@ -7,12 +7,14 @@ using AutoMapper.QueryableExtensions;
 using PostSharp.Patterns.Model;
 using Prism.Mvvm;
 using System.Data.Entity;
+using System.Diagnostics;
 using System.Net;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows.Input;
 using CookComputing.XmlRpc;
 using PostSharp.Patterns.Xaml;
+using Prism.Events;
 using Prism.Regions;
 
 namespace CustomerUpdator.ViewModels
@@ -22,10 +24,17 @@ namespace CustomerUpdator.ViewModels
     public class MainWindowViewModel : BindableBase
     {
         private readonly IRegionManager _regionManager;
+        private readonly IEventAggregator _eventAggregator;
 
-        public MainWindowViewModel(IRegionManager regionManager)
+        public MainWindowViewModel(IRegionManager regionManager,IEventAggregator eventAggregator)
         {
             _regionManager = regionManager;
+            _eventAggregator = eventAggregator;
+
+            _eventAggregator.GetEvent<SunAccountEvent>().Subscribe(x =>
+            {
+                Debug.WriteLine($"Partner Id :{x.PartnerId} \n Partner Name :{x.PartnerName}");
+            });
         }
 
         #region ShowSunAccountInfoCommand

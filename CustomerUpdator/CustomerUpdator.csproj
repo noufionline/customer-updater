@@ -59,7 +59,16 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ViewModels\CustomerMapperViewViewModel.cs" />
+    <Compile Include="Contracts\IOdooService.cs" />
+    <Compile Include="Contracts\IPartnerService.cs" />
+    <Compile Include="Contracts\ISunSystemService.cs" />
+    <Compile Include="ViewModels\LookupItem.cs" />
+    <Compile Include="Services\OdooService.cs" />
+    <Compile Include="Services\PartnerService.cs" />
+    <Compile Include="ViewModels\SunAccountDetail.cs" />
     <Compile Include="ViewModels\SunAccountDetailViewModel.cs" />
+    <Compile Include="ViewModels\SunAccountEvent.cs" />
+    <Compile Include="Services\SunSystemService.cs" />
     <Compile Include="Views\CustomerMapperView.xaml.cs">
       <DependentUpon>CustomerMapperView.xaml</DependentUpon>
     </Compile>
