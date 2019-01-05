@@ -1,0 +1,114 @@
+﻿<UserControl x:Class="CustomerUpdator.Views.CustomerMapperView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             prism:ViewModelLocator.AutoWireViewModel="True">
+    <Grid>
+                 <dxlc:LayoutControl>
+            <dxlc:LayoutGroup Orientation="Vertical">
+                <dxlc:LayoutGroup Header="Customer (ABS)" View="GroupBox" dxlc:LayoutControl.AllowVerticalSizing="True" >
+                    <dxlc:LayoutGroup Orientation="Vertical" >
+                        <dxlc:LayoutItem>
+                            <dxg:GridControl MaxHeight="400"  ItemsSource="{Binding Partners}">
+                                <dxmvvm:Interaction.Behaviors>
+                                    <dxmvvm:EventToCommand Command="{Binding SelectCommand}"
+                                        EventName="MouseDoubleClick"
+                                        PassEventArgsToCommand="True">
+                                        <dxmvvm:EventToCommand.EventArgsConverter>
+                                            <dx:EventArgsToDataRowConverter />
+                                        </dxmvvm:EventToCommand.EventArgsConverter>
+                                    </dxmvvm:EventToCommand>
+                                </dxmvvm:Interaction.Behaviors>
+                                <dxg:GridControl.View>
+                                    <dxg:TableView ShowGroupPanel="False" AutoWidth="True" AllowEditing="False" ShowAutoFilterRow="True" ShowCriteriaInAutoFilterRow="True" />
+                                </dxg:GridControl.View>
+                                <dxg:GridColumn FieldName="Id" MaxWidth="50"/>
+                                <dxg:GridColumn FieldName="Name"/>
+                                <dxg:GridColumn FieldName="TaxRegistrationNo"/>
+                                <dxg:GridColumn Width="550" FixedWidth="True" VisibleIndex="3">
+                                    <dxg:GridColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <dxg:GridControl MaxHeight="200" AutoExpandAllGroups="True" Margin="5"
+                                                ItemsSource="{Binding RowData.Row.SunAccounts}"
+                                                Visibility="{Binding RowData.Row.SunAccounts.Count, Converter={StaticResource NumericToVisibilityConverter}}">
+                                                <dxg:GridControl.View>
+                                                    <dxg:TableView
+                                                    
+                                                        ShowHorizontalLines="False"
+                                                        AllowAdvancedVerticalNavigation="True"
+                                                        AllowEditing="False" 
+                                                        AllowPerPixelScrolling="True"
+                                                        AutoWidth="True"
+                                                        HorizontalScrollbarVisibility="Hidden"
+                                                        x:Name="TableView"
+                                                        ShowGroupPanel="False"
+                                                        ShowIndicator="False">
+                                                        <dxg:TableView.GroupValueTemplate>
+                                                            <DataTemplate>
+                                                                <TextBlock Margin="10,0,0,0" Text="{Binding Value}" />
+                                                            </DataTemplate>
+                                                        </dxg:TableView.GroupValueTemplate>
+                                                    </dxg:TableView>
+                                                </dxg:GridControl.View>
+                                                <dxg:GridColumn
+                                                    Width="125"
+                                                    FieldName="AccountCode"
+                                                    FixedWidth="True"/>
+                                                <dxg:GridColumn FieldName="AccountName"/>
+                                            </dxg:GridControl>
+                                        </DataTemplate>
+                                    </dxg:GridColumn.CellTemplate>
+                                </dxg:GridColumn>
+                                <dxg:GridColumn FieldName="SunAccountsCount"/>
+                            </dxg:GridControl>
+                        </dxlc:LayoutItem>
+                    </dxlc:LayoutGroup>
+                </dxlc:LayoutGroup>
+                   <dxlc:LayoutGroup Header="LayoutGroup" View="Tabs">
+                   <dxlc:LayoutGroup Header="Customers and Projects" dxlc:LayoutControl.AllowHorizontalSizing="True">
+                         <dxlc:LayoutGroup Header="Sun System Customers" View="GroupBox">
+                            <dxg:GridControl MaxHeight="400"  ItemsSource="{Binding SunCustomers}">
+                                <dxg:GridControl.View>
+                                    <dxg:TableView ShowGroupPanel="False" AutoWidth="True" AllowEditing="False" ShowAutoFilterRow="True" ShowCriteriaInAutoFilterRow="True" >
+                                        <dxg:TableView.FormatConditions>
+                                            <dxg:FormatCondition ValueRule="Equal" Value1="True" FieldName="IsProject" PredefinedFormatName="LightRedFillWithDarkRedText" ApplyToRow="True"/>   
+                                        </dxg:TableView.FormatConditions>
+                                    </dxg:TableView>
+                                </dxg:GridControl.View>
+                                <dxg:GridColumn FieldName="Code" Width="100" FixedWidth="True"/>
+                                <dxg:GridColumn FieldName="Name" Width="250" FixedWidth="True"/>
+                                <dxg:GridColumn FieldName="VatCode" Width="150" FixedWidth="True"/>
+                                <dxg:GridColumn FieldName="Address"/>
+                                <dxg:GridColumn FieldName="IsProject"/>
+                            </dxg:GridControl>
+                        </dxlc:LayoutGroup>
+                        <dxlc:LayoutGroup Header="Odoo Customers" View="GroupBox" dxlc:LayoutControl.AllowHorizontalSizing="True">
+                           <dxg:GridControl MaxHeight="400"  ItemsSource="{Binding OdooCustomers}">
+                               <dxg:GridControl.View>
+                                   <dxg:TableView ShowGroupPanel="False" AutoWidth="True" AllowEditing="False" ShowAutoFilterRow="True" ShowCriteriaInAutoFilterRow="True" >
+                                        <dxg:TableView.FormatConditions>
+                                            <dxg:FormatCondition ValueRule="Equal" Value1="True" FieldName="IsProject" PredefinedFormatName="LightRedFillWithDarkRedText" ApplyToRow="True"></dxg:FormatCondition>
+                                        </dxg:TableView.FormatConditions>
+                                   </dxg:TableView>
+                               </dxg:GridControl.View>
+                               <dxg:GridColumn FieldName="PartnerId" Width="100" FixedWidth="True"/>
+                               <dxg:GridColumn FieldName="PartnerName" Width="250" FixedWidth="True"/>  
+                               <dxg:GridColumn FieldName="ProjectId" Width="100" FixedWidth="True"/>
+                               <dxg:GridColumn FieldName="ProjectName" Width="250" FixedWidth="True"/>
+                               <dxg:GridColumn FieldName="SunAccountCode" Width="150" FixedWidth="True"/>
+                               <dxg:GridColumn FieldName="IsProject"/>
+                           </dxg:GridControl>
+                       </dxlc:LayoutGroup>
+                   </dxlc:LayoutGroup>   
+                       <dxlc:LayoutGroup Header="Tasks"></dxlc:LayoutGroup>
+                       <dxlc:LayoutGroup Header="Logs and Messages"></dxlc:LayoutGroup>
+                       <dxlc:LayoutGroup Header="Payment Terms"></dxlc:LayoutGroup>
+                </dxlc:LayoutGroup>
+                </dxlc:LayoutGroup>
+        </dxlc:LayoutControl>
+    </Grid>
+</UserControl>

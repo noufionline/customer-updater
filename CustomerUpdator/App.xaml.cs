@@ -3,6 +3,7 @@ using Prism.Ioc;
 using Prism.Modularity;
 using System.Windows;
 using AutoMapper;
+using CustomerUpdator.ViewModels;
 
 namespace CustomerUpdator
 {
@@ -18,6 +19,11 @@ namespace CustomerUpdator
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+
+            containerRegistry.RegisterForNavigation<CustomerMapperView>();
+            containerRegistry.RegisterForNavigation<SunAccountDetailView>();
+            containerRegistry.Register(typeof(IPartnerService),typeof(PartnerService));
+
             var mapperConfiguration = new MapperConfiguration(config =>
             {
                 config.CreateMap<Partner, PartnerModel>()
@@ -25,6 +31,8 @@ namespace CustomerUpdator
                 config.CreateMap<PartnerAccountCode, SunAccountModel>();
             });
             containerRegistry.RegisterInstance(typeof(IMapper),mapperConfiguration.CreateMapper());
+
+
         }
     }
 }

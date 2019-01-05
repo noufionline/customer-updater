@@ -7,6 +7,7 @@
         xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
         xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
         xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+        xmlns:views="clr-namespace:CustomerUpdator.Views"
         x:Class="CustomerUpdator.Views.MainWindow"
         prism:ViewModelLocator.AutoWireViewModel="True" WindowKind="Ribbon" WindowState="Maximized"
         Title="{Binding Title}" Height="600" Width="525">
@@ -14,101 +15,11 @@
         <dxmvvm:NumericToVisibilityConverter x:Key="NumericToVisibilityConverter" />
     </dx:ThemedWindow.Resources>
     <Grid>
-        <!--<ContentControl prism:RegionManager.RegionName="ContentRegion" />-->
-        <dxlc:LayoutControl>
-            <dxlc:LayoutGroup Orientation="Vertical">
-                <dxlc:LayoutGroup Header="Customer (ABS)" View="GroupBox" dxlc:LayoutControl.AllowVerticalSizing="True" >
-                    <dxlc:LayoutGroup Orientation="Vertical" >
-                        <dxlc:LayoutItem>
-                            <dxg:GridControl MaxHeight="400"  ItemsSource="{Binding Partners}">
-                                <dxmvvm:Interaction.Behaviors>
-                                    <dxmvvm:EventToCommand Command="{Binding SelectCommand}"
-                                        EventName="MouseDoubleClick"
-                                        PassEventArgsToCommand="True">
-                                        <dxmvvm:EventToCommand.EventArgsConverter>
-                                            <dx:EventArgsToDataRowConverter />
-                                        </dxmvvm:EventToCommand.EventArgsConverter>
-                                    </dxmvvm:EventToCommand>
-                                </dxmvvm:Interaction.Behaviors>
-                                <dxg:GridControl.View>
-                                    <dxg:TableView ShowGroupPanel="False" AutoWidth="True" AllowEditing="False" ShowAutoFilterRow="True" ShowCriteriaInAutoFilterRow="True" />
-                                </dxg:GridControl.View>
-                                <dxg:GridColumn FieldName="Id" MaxWidth="50"/>
-                                <dxg:GridColumn FieldName="Name"/>
-                                <dxg:GridColumn FieldName="TaxRegistrationNo"/>
-                                <dxg:GridColumn Width="550" FixedWidth="True" VisibleIndex="3">
-                                    <dxg:GridColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <dxg:GridControl MaxHeight="200" AutoExpandAllGroups="True" Margin="5"
-                                                ItemsSource="{Binding RowData.Row.SunAccounts}"
-                                                Visibility="{Binding RowData.Row.SunAccounts.Count, Converter={StaticResource NumericToVisibilityConverter}}">
-                                                <dxg:GridControl.View>
-                                                    <dxg:TableView
-                                                    
-                                                        ShowHorizontalLines="False"
-                                                        AllowAdvancedVerticalNavigation="True"
-                                                        AllowEditing="False" 
-                                                        AllowPerPixelScrolling="True"
-                                                        AutoWidth="True"
-                                                        HorizontalScrollbarVisibility="Hidden"
-                                                        x:Name="TableView"
-                                                        ShowGroupPanel="False"
-                                                        ShowIndicator="False">
-                                                        <dxg:TableView.GroupValueTemplate>
-                                                            <DataTemplate>
-                                                                <TextBlock Margin="10,0,0,0" Text="{Binding Value}" />
-                                                            </DataTemplate>
-                                                        </dxg:TableView.GroupValueTemplate>
-                                                    </dxg:TableView>
-                                                </dxg:GridControl.View>
-                                                <dxg:GridColumn
-                                                    Width="125"
-                                                    FieldName="AccountCode"
-                                                    FixedWidth="True"/>
-                                                <dxg:GridColumn FieldName="AccountName"/>
-                                            </dxg:GridControl>
-                                        </DataTemplate>
-                                    </dxg:GridColumn.CellTemplate>
-                                </dxg:GridColumn>
-                                <dxg:GridColumn FieldName="SunAccountsCount"/>
-                            </dxg:GridControl>
-                        </dxlc:LayoutItem>
-                    </dxlc:LayoutGroup>
-                </dxlc:LayoutGroup>
-                   <dxlc:LayoutGroup Header="LayoutGroup" View="Tabs">
-                   <dxlc:LayoutGroup Header="Customers and Projects">
-                         <dxlc:LayoutGroup Header="Sun System Customers" View="GroupBox">
-                            <dxg:GridControl MaxHeight="400"  ItemsSource="{Binding SunCustomers}">
-                                <dxg:GridControl.View>
-                                    <dxg:TableView ShowGroupPanel="False" AutoWidth="True" AllowEditing="False" ShowAutoFilterRow="True" ShowCriteriaInAutoFilterRow="True" />
-                                </dxg:GridControl.View>
-                                <dxg:GridColumn FieldName="Code" Width="100" FixedWidth="True"/>
-                                <dxg:GridColumn FieldName="Name" Width="250" FixedWidth="True"/>
-                                <dxg:GridColumn FieldName="VatCode" Width="150" FixedWidth="True"/>
-                                <dxg:GridColumn FieldName="Address"/>
-                                <dxg:GridColumn FieldName="IsProject"/>
-                            </dxg:GridControl>
-                        </dxlc:LayoutGroup>
-                        <dxlc:LayoutGroup Header="Odoo Customers" View="GroupBox">
-                           <dxg:GridControl MaxHeight="400"  ItemsSource="{Binding OdooCustomers}">
-                               <dxg:GridControl.View>
-                                   <dxg:TableView ShowGroupPanel="False" AutoWidth="True" AllowEditing="False" ShowAutoFilterRow="True" ShowCriteriaInAutoFilterRow="True" />
-                               </dxg:GridControl.View>
-                               <dxg:GridColumn FieldName="PartnerId" Width="100" FixedWidth="True"/>
-                               <dxg:GridColumn FieldName="PartnerName" Width="250" FixedWidth="True"/>  
-                               <dxg:GridColumn FieldName="ProjectId" Width="100" FixedWidth="True"/>
-                               <dxg:GridColumn FieldName="ProjectName" Width="250" FixedWidth="True"/>
-                               <dxg:GridColumn FieldName="SunAccountCode" Width="150" FixedWidth="True"/>
-                               <dxg:GridColumn FieldName="IsProject"/>
-                           </dxg:GridControl>
-                       </dxlc:LayoutGroup>
-                   </dxlc:LayoutGroup>   
-                   <dxlc:LayoutGroup Header="Tasks"></dxlc:LayoutGroup>
-                   <dxlc:LayoutGroup Header="Logs and Messages"></dxlc:LayoutGroup>
-                </dxlc:LayoutGroup>
-
-                </dxlc:LayoutGroup>
-     
-        </dxlc:LayoutControl>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <dx:SimpleButton Content="Show" Command="{Binding ShowSunAccountInfoCommand}"></dx:SimpleButton>
+        <ContentControl Grid.Row="1" prism:RegionManager.RegionName="ContentRegion" />
     </Grid>
 </dx:ThemedWindow>

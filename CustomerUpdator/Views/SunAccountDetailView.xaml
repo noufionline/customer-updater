@@ -1,0 +1,79 @@
+﻿<UserControl
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             x:Class="CustomerUpdator.Views.SunAccountDetailView"
+             prism:ViewModelLocator.AutoWireViewModel="True">
+    <UserControl.Resources>
+        <dx:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
+
+    <Grid>
+        <dxlc:LayoutControl>
+            <dxlc:LayoutGroup Orientation="Vertical">
+                <dxlc:LayoutItem>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                        <dxlc:LayoutItem Label="Sun Account Code">
+                            <dxe:TextEdit Width="150" EditValue="{Binding SunAccountCode, Delay=300, UpdateSourceTrigger=PropertyChanged}" Text="141320">
+                                <dxmvvm:Interaction.Behaviors>
+                                    <dxmvvm:KeyToCommand KeyGesture="Enter" Command="{Binding SearchCommand}"/>
+                                </dxmvvm:Interaction.Behaviors>
+                            </dxe:TextEdit>
+                        </dxlc:LayoutItem>
+                        <mah:ProgressRing Visibility="{Binding SearchCommand.IsExecuting, Converter={StaticResource BooleanToVisibilityConverter}}" Height="16" Width="16" Margin="3,0,0,0"  Padding="5"/>
+                    </StackPanel>
+
+                </dxlc:LayoutItem>                
+                <dxlc:LayoutItem Label="Customer Name">
+                    <dxg:LookUpEdit EditValue="{Binding Entity.PartnerId}" 
+                                    DisplayMember="Name"
+                                    ValueMember="Id"
+                                    IsReadOnly="True" AllowDefaultButton="False"
+                                    ItemsSource="{Binding Customers}" >
+                        <dxg:LookUpEdit.Buttons>
+                            <dxe:ButtonInfo GlyphKind="Refresh" Command="{Binding MapCustomerCommand}"></dxe:ButtonInfo>
+                        </dxg:LookUpEdit.Buttons>
+                    </dxg:LookUpEdit>
+                </dxlc:LayoutItem>
+                <dxlc:LayoutItem Label="Project Name">
+                    <dxg:LookUpEdit EditValue="{Binding Entity.ProjectId}" IsReadOnly="True"
+                                    DisplayMember="Name"
+                                    ValueMember="Id"
+                                    AllowDefaultButton="False"
+                                    ItemsSource="{Binding Projects}" >
+                        <dxg:LookUpEdit.Buttons>
+                            <dxe:ButtonInfo GlyphKind="Refresh" Command="{Binding MapProjectCommand}"></dxe:ButtonInfo>
+                        </dxg:LookUpEdit.Buttons>
+                    </dxg:LookUpEdit>
+                </dxlc:LayoutItem>
+                <dxlc:LayoutGroup Header="Sun System" View="GroupBox">
+                    <dxlc:LayoutGroup Orientation="Vertical">
+                        <dxlc:LayoutItem Label="Account Name" LabelPosition="Top">
+                            <dxe:TextEdit Text="{Binding Entity.AccountName}" IsReadOnly="True"/>
+                        </dxlc:LayoutItem>
+                        <dxlc:LayoutItem Label="Address" LabelPosition="Top">
+                            <dxe:TextEdit Text="{Binding Entity.Address}" IsReadOnly="True" TextWrapping="WrapWithOverflow" />
+                        </dxlc:LayoutItem>
+                    </dxlc:LayoutGroup>
+
+                </dxlc:LayoutGroup>
+              <dxlc:LayoutGroup Header="Odoo" View="GroupBox" Orientation="Vertical">
+                  <dxlc:LayoutItem Label="Name" LabelPosition="Top">
+                      <dxe:TextEdit Text="{Binding Entity.OdooName}" IsReadOnly="True"/>
+                  </dxlc:LayoutItem>
+                  <dxlc:LayoutItem Label="Is Project">
+                      <dxe:CheckEdit EditValue="{Binding Entity.IsProject}" IsReadOnly="True"/>
+                  </dxlc:LayoutItem>
+                    <dxlc:LayoutItem Label="Sun DB">
+                        <dxe:TextEdit EditValue="{Binding Entity.SunDb}"/>
+                    </dxlc:LayoutItem>
+                </dxlc:LayoutGroup>
+            </dxlc:LayoutGroup>
+        </dxlc:LayoutControl>
+    </Grid>
+</UserControl>

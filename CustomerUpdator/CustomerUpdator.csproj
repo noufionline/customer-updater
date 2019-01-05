@@ -58,6 +58,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ViewModels\CustomerMapperViewViewModel.cs" />
+    <Compile Include="ViewModels\SunAccountDetailViewModel.cs" />
+    <Compile Include="Views\CustomerMapperView.xaml.cs">
+      <DependentUpon>CustomerMapperView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SunAccountDetailView.xaml.cs">
+      <DependentUpon>SunAccountDetailView.xaml</DependentUpon>
+    </Compile>
+    <Page Include="Views\CustomerMapperView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -76,6 +88,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\SunAccountDetailView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -102,6 +118,15 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="MahApps.Metro">
+      <Version>1.6.5</Version>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>12.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="RestSharp">
+      <Version>106.6.3</Version>
+    </PackageReference>
     <PackageReference Include="xmlrpcnet">
       <Version>3.0.0.266</Version>
     </PackageReference>

@@ -19,18 +19,16 @@ namespace CustomerUpdator
         [StringLength(255)]
         public string Code { get; set; }
 
-        public double? SunAccountCode { get; set; }
+        public string SunAccountCode { get; set; }
 
         [StringLength(255)]
         public string Analysis { get; set; }
 
         [StringLength(255)]
         public string Name { get; set; }
-
-        public string Address
+        
+        public string GetAddress()
         {
-            get
-            {
                 var stringBuilder = new StringBuilder();
                 stringBuilder.Append(GetCleanString(Address1)).Append(" ")
                 .Append(GetCleanString(Address2)).Append(" ")
@@ -47,11 +45,8 @@ namespace CustomerUpdator
                 if (TryGetAddress(address, "P.O. BOX", out newAddress)) return newAddress;
                 if (TryGetAddress(address, "TELE", out newAddress)) return newAddress;
                 if (TryGetAddress(address, "TEL:", out newAddress)) return newAddress;
-
-
             
                 return address;
-            }
         }
 
         private bool TryGetAddress(string address,string value, out string newAddress)
