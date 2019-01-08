@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using CustomerUpdator.Contracts;
 using CustomerUpdator.ViewModels;
+
 
 namespace CustomerUpdator.Services
 {
@@ -18,6 +20,11 @@ namespace CustomerUpdator.Services
             var account = records.FirstOrDefault()?.GetEntity<SunAccount>();
             return account;
 
+        }
+
+        public Task<SunAccount> GetCustomerAsync(string accountCode)
+        {
+            return Task.Factory.StartNew(() => GetCustomer(accountCode));
         }
     }
 }

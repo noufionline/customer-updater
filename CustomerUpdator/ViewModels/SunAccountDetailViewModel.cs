@@ -1,11 +1,15 @@
 ﻿using Prism.Commands;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using CustomerUpdator.Contracts;
 using DevExpress.Mvvm;
+using DevExpress.Xpf.Core;
 using DevExpress.XtraPrinting.Native.WebClientUIControl;
 using PostSharp.Patterns.Model;
 using PostSharp.Patterns.Xaml;
@@ -18,64 +22,134 @@ namespace CustomerUpdator.ViewModels
 	public class SunAccountDetailViewModel : BindableBase
 	{
         private IPartnerService _service;
+        private readonly IOdooService _oDooService;
         private readonly IOdooService _odooService;
         private readonly ISunSystemService _sunSystemService;
         private readonly IEventAggregator _eventAggregator;
 
-        public SunAccountDetailViewModel(IPartnerService service,
-            IOdooService odooService,
-            ISunSystemService sunSystemService,
-            IEventAggregator eventAggregator)
+
+        public SunAccountDetailViewModel(IEventAggregator eventAggregator,
+            IPartnerService service,
+            IOdooService oDooService,
+            ISunSystemService sunSystemService) 
         {
             _service = service;
-            _odooService = odooService;
+            _oDooService = oDooService;
             _sunSystemService = sunSystemService;
             _eventAggregator = eventAggregator;
-            SearchCommand=new AsyncCommand(ExecuteSearch,CanExecuteSearch);
+            SearchCommand = new AsyncCommand(ExecuteSearch, CanExecuteSearch);
+            LoadCustomersCommand=new AsyncCommand(ExecuteLoadCustomers,CanExecuteLoadCustomers);
         }
 
-        public string SunAccountCode { get; set; } = "141320";
+        
+       
+
+        public string SunAccountCode { get; set; } 
+
+
 
         #region SearchCommand
 
         public AsyncCommand SearchCommand { get; set; }
 
-
         private async Task ExecuteSearch()
         {
+            ConnectionStatus = string.Empty;
+            SunSystemErrorInfo = string.Empty;
+            OdooErrorInfo = string.Empty;
+
+            FoundInAbs = FoundInSunSystem = FoundInOdoo = false;
+
             try
             {
+
+                ConnectionStatus = "Connecting to Abs...";
+
                 Entity = await _service.GetSunAccountDetail(SunAccountCode);
-                Customers=new List<LookupItem> {new LookupItem {Id = Entity.PartnerId,Name = Entity.PartnerName}};
-                if (Entity.ProjectId.HasValue)
+
+                FoundInAbs = Entity != null;
+
+                if (Entity == null)
                 {
-                    Projects=new List<LookupItem> {new LookupItem {Id = Entity.ProjectId.GetValueOrDefault(),Name = Entity.ProjectName}};
+                    DXMessageBox.Show("Sun Account Not found!!!", "Sun Account Info", MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+
+                    Customers = new ObservableCollection<LookupItem>(await _service.GetCustomersAsync());
+                    Entity=new SunAccountDetail();
+                    
+                }
+                else
+                {
+                    Customers = new ObservableCollection<LookupItem>(new List<LookupItem>
+                        {new LookupItem {Id = Entity.PartnerId, Name = Entity.PartnerName}});
+                    if (Entity.ProjectId.HasValue)
+                    {
+                        Projects =new ObservableCollection<LookupItem>(new List<LookupItem>
+                            {new LookupItem {Id = Entity.ProjectId.GetValueOrDefault(), Name = Entity.ProjectName}});
+                    }
                 }
 
-                var sunSystemInfo = await _sunSystemService.GetCustomer(SunAccountCode);
-                Entity.AccountName = sunSystemInfo.AccountName;
-                Entity.Address = sunSystemInfo.Address;
-
-
-                var odooInfo = _odooService.GetCustomer(SunAccountCode);
-
-                if (odooInfo != null)
+                try
                 {
-                    Entity.OdooName = odooInfo.PartnerName;
-                    Entity.IsProject = odooInfo.IsProject;
-                    Entity.SunDb = odooInfo.SunDb;
+                    ConnectionStatus = "Connecting to Sun System...";
+                    var sunSystemInfo = await _sunSystemService.GetCustomer(SunAccountCode);
+                    Entity.AccountName = sunSystemInfo.AccountName;
+                    Entity.Address = sunSystemInfo.Address;
+                    FoundInSunSystem = true;
+
+                }
+                catch (ConnectionFailedException sunSystemConnectionException)
+                {
+                    SunSystemErrorInfo = sunSystemConnectionException.Message;
+                }
+
+
+
+                try
+                {
+                    ConnectionStatus = "Connecting to Odoo...";
+                    var odooInfo = await _oDooService.GetCustomerAsync(SunAccountCode);
+
+                    if (odooInfo != null)
+                    {
+                        Entity.OdooName = odooInfo.PartnerName;
+                        Entity.IsProject = odooInfo.IsProject;
+                        Entity.SunDb = odooInfo.SunDb;
+                        FoundInOdoo = true;
+                    }
+                }
+                catch (ConnectionFailedException odooConnectionException)
+                {
+                    OdooErrorInfo = odooConnectionException.Message;
                 }
             }
-            catch (Exception exception)
+            finally
             {
-                Console.WriteLine(exception);
-                throw;
+                ConnectionStatus = string.Empty;
+                ShowStatus = true;
             }
+
+
+
 
         }
 
-        public List<LookupItem> Customers { get; set; }
-        public List<LookupItem> Projects { get; set; }
+        public bool ShowStatus { get; set; }
+
+        public bool FoundInSunSystem { get; set; }
+
+        public bool FoundInOdoo { get; set; }
+
+        public bool FoundInAbs { get; set; }
+
+        public string ConnectionStatus { get; set; }
+
+        public string OdooErrorInfo { get; set; }
+
+        public string SunSystemErrorInfo { get; set; }
+
+        public ObservableCollection<LookupItem> Customers { get; set; }
+        public ObservableCollection<LookupItem> Projects { get; set; }
 
         public SunAccountDetail Entity { get;set; }
 
@@ -122,13 +196,82 @@ namespace CustomerUpdator.ViewModels
         {
             _eventAggregator
                 .GetEvent<SunAccountEvent>()
-                .Publish((Entity.PartnerId,Entity.PartnerName,Entity.ProjectId,Entity.ProjectName));
+                .Publish((Entity.PartnerId,Entity.PartnerName,Entity.ProjectId,Entity.ProjectName,Entity.SunAccountCode));
             Debug.WriteLine("Apply Clicked");
+           
         }
 
 
-        protected bool CanExecuteApply => Entity!=null;
+        protected bool CanExecuteApply => Entity!=null && Entity.PartnerId>0;
+
+        #endregion
+
+
+        #region LoadCustomersCommand
+
+        public AsyncCommand LoadCustomersCommand { get; set; }
+
+
+        private async Task ExecuteLoadCustomers()
+        {
+            Customers =new ObservableCollection<LookupItem>(await _service.GetCustomersAsync());
+        }
+
+
+        protected bool CanExecuteLoadCustomers() => !FoundInAbs;
+
+        #endregion
+
+        #region UpdateSunAccountCodeCommand
+
+        [Command] public ICommand UpdateSunAccountCodeCommand { get; set; }
+
+
+        private void ExecuteUpdateSunAccountCode()
+        {
+
+        }
+
+
+        protected bool CanExecuteUpdateSunAccountCode => Entity!=null && Entity.PartnerId > 0 
+                                                                      && !FoundInAbs && FoundInSunSystem 
+                                                                      && string.IsNullOrWhiteSpace(Entity.SunAccountCode);
 
         #endregion
 	}
+
+    public interface IOdooService
+    {
+        SunAccount GetCustomer(string accountCode);
+        Task<SunAccount> GetCustomerAsync(string accountCode);
+    }
+
+    [Serializable]
+    public class ConnectionFailedException : Exception
+    {
+        //
+        // For guidelines regarding the creation of new exception types, see
+        //    http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpgenref/html/cpconerrorraisinghandlingguidelines.asp
+        // and
+        //    http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dncscol/html/csharp07192001.asp
+        //
+
+        public ConnectionFailedException()
+        {
+        }
+
+        public ConnectionFailedException(string message) : base(message)
+        {
+        }
+
+        public ConnectionFailedException(string message, Exception inner) : base(message, inner)
+        {
+        }
+
+        protected ConnectionFailedException(
+            SerializationInfo info,
+            StreamingContext context) : base(info, context)
+        {
+        }
+    }
 }

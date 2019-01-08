@@ -2,8 +2,8 @@
 
 namespace CustomerUpdator.Contracts
 {
-    public interface IOdooService
-    {
-        SunAccount GetCustomer(string accountCode);
-    }
+    //public interface IOdooService
+    //{
+    //    SunAccount GetCustomer(string accountCode);
+    //}
 }

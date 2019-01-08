@@ -7,8 +7,12 @@
              xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
              xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
              prism:ViewModelLocator.AutoWireViewModel="True">
+    <UserControl.Resources>
+        <dxmvvm:NumericToVisibilityConverter x:Key="NumericToVisibilityConverter"/>
+    </UserControl.Resources>
     <Grid>
-                 <dxlc:LayoutControl>
+
+        <dxlc:LayoutControl>
             <dxlc:LayoutGroup Orientation="Vertical">
                 <dxlc:LayoutGroup Header="Customer (ABS)" View="GroupBox" dxlc:LayoutControl.AllowVerticalSizing="True" >
                     <dxlc:LayoutGroup Orientation="Vertical" >

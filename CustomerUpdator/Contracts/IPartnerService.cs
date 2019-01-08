@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using CustomerUpdator.ViewModels;
 
 namespace CustomerUpdator.Contracts
@@ -8,5 +9,6 @@ namespace CustomerUpdator.Contracts
         Task<SunAccountDetail> GetSunAccountDetail(string accountCode);
         //Task<(string AccountName, string Address)> GetSunSystemAccountInfo(string accountCode);
         //List<SunAccount> GetSunAccounts(string accountCode);
+        Task<List<LookupItem>> GetCustomersAsync();
     }
 }
