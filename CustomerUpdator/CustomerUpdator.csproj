@@ -59,6 +59,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Class1.cs" />
     <Compile Include="Controls\JButtonEdit.cs" />
     <Compile Include="ViewModels\CustomerMapperViewViewModel.cs" />
     <Compile Include="Contracts\IOdooService.cs" />

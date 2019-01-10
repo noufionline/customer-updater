@@ -10,7 +10,7 @@ namespace CustomerUpdator.Services
 {
     public class SunSystemService : ISunSystemService
     {
-        public async Task<(string AccountName, string Address)> GetCustomer(string accountCode)
+        public async Task<(string AccountName, string Address)?> GetCustomer(string accountCode)
         {
            
             using (var con = new SqlConnection(ConfigurationManager.ConnectionStrings["SunDb"].ConnectionString))
@@ -22,7 +22,7 @@ namespace CustomerUpdator.Services
 
                 if (customer == null)
                 {
-                    return (null, null);
+                    return null;
                 }
 
                 return (customer.Name, customer.GetAddress());

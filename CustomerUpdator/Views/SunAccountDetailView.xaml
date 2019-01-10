@@ -75,34 +75,49 @@
                     </dxe:CheckEdit>
                 </StackPanel>
             </dxlc:LayoutItem>
-            <dxlc:LayoutGroup View="Tabs">
-                <dxlc:LayoutGroup Header="ABS" View="Group" Orientation="Vertical">
+            <dxlc:LayoutGroup View="Group" Orientation="Vertical">
+                <dxlc:LayoutGroup Header="ABS" View="GroupBox" Orientation="Vertical">
+                    <dxlc:LayoutItem Label="PartnerId">
+                        <dxe:TextEdit EditValue="{Binding Entity.PartnerId}"/>
+                    </dxlc:LayoutItem>
                     <dxlc:LayoutItem Label="Customer Name" LabelPosition="Top">
-                        <dxg:LookUpEdit EditValue="{Binding Entity.PartnerId}" 
+                        <dxg:LookUpEdit EditValue="{Binding Entity.PartnerId, UpdateSourceTrigger=PropertyChanged}" NullValueButtonPlacement="EditBox" NullValue="0" AllowNullInput="True"
                                    DisplayMember="Name"
                                    ValueMember="Id"
                                    AutoPopulateColumns="False"
                                    VerticalAlignment="Top"
                                    HorizontalAlignment="Stretch"
-                                   IsReadOnly="{Binding FoundInAbs}" AllowDefaultButton="{Binding FoundInAbs,Converter={StaticResource BooleanNegationConverter}}"
+                                   IsEnabled="{Binding CustomerIsReadOnly,Converter={StaticResource BooleanNegationConverter}}" 
+                                   AllowDefaultButton="{Binding CustomerIsReadOnly, Converter={StaticResource BooleanNegationConverter}}"
                                    ItemsSource="{Binding Customers}" >
                             <dxmvvm:Interaction.Behaviors>
-                                <dxmvvm:EventToCommand EventName="PopupOpening" Command="{Binding LoadCustomersCommand}"/>
+                                <dxmvvm:EventToCommand EventName="PopupOpening" Command="{Binding PopulateCustomersCommand}"/>
+                                <dxmvvm:EventToCommand EventName="EditValueChanged" Command="{Binding LoadCustomerInfoCommand}"/>
                             </dxmvvm:Interaction.Behaviors>
                             <dxg:LookUpEdit.PopupContentTemplate>
                                 <ControlTemplate>
-                                    <dxg:GridControl Name="PART_GridControl">
-                                        <dxg:GridControl.Columns>
-                                            <dxg:GridColumn FieldName="Name"></dxg:GridColumn>
-                                        </dxg:GridControl.Columns>
+                                    <dxg:GridControl x:Name="PART_GridControl">
                                         <dxg:GridControl.View>
-                                            <dxg:TableView AutoWidth="True"></dxg:TableView>
+                                            <dxg:TableView AutoWidth="True"/>
                                         </dxg:GridControl.View>
+                                        <dxg:GridColumn FieldName="Name"/>
                                     </dxg:GridControl>
                                 </ControlTemplate>
                             </dxg:LookUpEdit.PopupContentTemplate>
                             <dxe:ButtonInfo GlyphKind="Refresh" Command="{Binding MapCustomerCommand}"/>
+                            <dxe:ButtonInfo GlyphKind="Custom">
+                                <dxe:ButtonInfo.Template>
+                                    <DataTemplate>
+                                        <ContentControl Visibility="{Binding (dxe:BaseEdit.OwnerEdit).DataContext.LoadCustomerInfoCommand.IsExecuting, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                            <dx:ColumnWaitIndicator/>
+                                        </ContentControl>
+                                    </DataTemplate>
+                                </dxe:ButtonInfo.Template>
+                            </dxe:ButtonInfo>
                         </dxg:LookUpEdit>
+                    </dxlc:LayoutItem>
+                    <dxlc:LayoutItem Label="Tax Registration No" LabelPosition="Top">
+                        <dxe:TextEdit EditValue="{Binding Entity.TaxRegistrationNo}" IsReadOnly="True"/>
                     </dxlc:LayoutItem>
                     <dxlc:LayoutItem Label="Project Name" LabelPosition="Top">
                         <dxg:LookUpEdit EditValue="{Binding Entity.ProjectId}" IsReadOnly="True"
@@ -114,12 +129,29 @@
                         </dxg:LookUpEdit>
                     </dxlc:LayoutItem>
                     <dxlc:LayoutItem>
+                        <dxg:GridControl Height="150" ItemsSource="{Binding Entity.Accounts}">
+                            <dxg:GridControl.View>
+                                <dxg:TableView NavigationStyle="Row" ShowGroupPanel="False" AutoWidth="True"
+                                               ShowIndicator="False" 
+                                               ShowVerticalLines="False" ShowHorizontalLines="False" />
+                            </dxg:GridControl.View>
+
+                            <dxg:GridColumn FieldName="Code" Width="75"/>
+                            <dxg:GridColumn FieldName="Name" Width="150"/>
+                            <dxg:GridColumn FieldName="Address"/>
+
+                        </dxg:GridControl>
+                    </dxlc:LayoutItem>
+                    <dxlc:LayoutItem>
                         <dx:SimpleButton Content="Update Sun Account Code" Glyph="{dx:DXImage Image=Save_16x16.png}" 
                                          Command="{Binding UpdateSunAccountCodeCommand}"
                                          HorizontalAlignment="Center"/>
                     </dxlc:LayoutItem>
                 </dxlc:LayoutGroup>
-                <dxlc:LayoutGroup Header="Sun System" View="Group" Orientation="Vertical">
+                <dxlc:LayoutGroup Header="Sun System" View="GroupBox" Orientation="Vertical">
+                    <dxlc:LayoutItem Label="Account Code" LabelPosition="Top">
+                        <dxe:TextEdit EditValue="{Binding Entity.AccountCode}"/>
+                    </dxlc:LayoutItem>
                     <dxlc:LayoutItem Label="Account Name" LabelPosition="Top">
                         <dxe:TextEdit Text="{Binding Entity.AccountName}" IsReadOnly="True"/>
                     </dxlc:LayoutItem>
@@ -131,7 +163,7 @@
                     </dxlc:LayoutItem>
 
                 </dxlc:LayoutGroup>
-                <dxlc:LayoutGroup Header="Odoo" View="Group" Orientation="Vertical">
+                <dxlc:LayoutGroup Header="Odoo" View="GroupBox" Orientation="Vertical">
                     <dxlc:LayoutItem Label="Name" LabelPosition="Top">
                         <dxe:TextEdit Text="{Binding Entity.OdooName}" IsReadOnly="True"/>
                     </dxlc:LayoutItem>

@@ -17,6 +17,15 @@ namespace CustomerUpdator.Services
             return JsonConvert.DeserializeObject<SunAccountDetail>(response.Content);
         }
 
+        public async Task<SunAccountDetail> GetSunAccountDetail(int id)
+        {
+            var client = new RestClient($"https://localhost:5051/api/partners/{id}/accountInfo");
+            var request = new RestRequest(Method.GET);
+            IRestResponse response = await client.ExecuteTaskAsync(request);
+            return JsonConvert.DeserializeObject<SunAccountDetail>(response.Content);
+        }
+
+
         public async Task<List<LookupItem>> GetCustomersAsync()
         {
              var client = new RestClient("https://localhost:5051/api/lookup/partner-lookup");

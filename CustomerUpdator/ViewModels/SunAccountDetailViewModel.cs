@@ -38,7 +38,8 @@ namespace CustomerUpdator.ViewModels
             _sunSystemService = sunSystemService;
             _eventAggregator = eventAggregator;
             SearchCommand = new AsyncCommand(ExecuteSearch, CanExecuteSearch);
-            LoadCustomersCommand=new AsyncCommand(ExecuteLoadCustomers,CanExecuteLoadCustomers);
+            PopulateCustomersCommand=new AsyncCommand(ExecutePopulateCustomers,CanExecutePopulateCustomers);
+            LoadCustomerInfoCommand = new AsyncCommand(ExecuteLoadCustomerInfo, CanExecuteLoadCustomerInfo);
         }
 
         
@@ -63,6 +64,8 @@ namespace CustomerUpdator.ViewModels
             try
             {
 
+                bool searchInSunAndOdoo=false;
+                
                 ConnectionStatus = "Connecting to Abs...";
 
                 Entity = await _service.GetSunAccountDetail(SunAccountCode);
@@ -71,12 +74,16 @@ namespace CustomerUpdator.ViewModels
 
                 if (Entity == null)
                 {
-                    DXMessageBox.Show("Sun Account Not found!!!", "Sun Account Info", MessageBoxButton.OK,
+                    var result=DXMessageBox.Show(String.Format("Sun Account Not found in ABS.\nDo you want to continue searching in Sun System?"), "Sun Account Info", MessageBoxButton.YesNo,
                         MessageBoxImage.Warning);
 
-                    Customers = new ObservableCollection<LookupItem>(await _service.GetCustomersAsync());
+                    searchInSunAndOdoo = result == MessageBoxResult.Yes;
+
                     Entity=new SunAccountDetail();
-                    
+
+                    Customers = new ObservableCollection<LookupItem>(await _service.GetCustomersAsync());
+
+                    searchInSunAndOdoo= string.IsNullOrWhiteSpace(Entity.SunAccountCode);
                 }
                 else
                 {
@@ -89,39 +96,54 @@ namespace CustomerUpdator.ViewModels
                     }
                 }
 
-                try
+                if (searchInSunAndOdoo)
                 {
-                    ConnectionStatus = "Connecting to Sun System...";
-                    var sunSystemInfo = await _sunSystemService.GetCustomer(SunAccountCode);
-                    Entity.AccountName = sunSystemInfo.AccountName;
-                    Entity.Address = sunSystemInfo.Address;
-                    FoundInSunSystem = true;
-
-                }
-                catch (ConnectionFailedException sunSystemConnectionException)
-                {
-                    SunSystemErrorInfo = sunSystemConnectionException.Message;
-                }
-
-
-
-                try
-                {
-                    ConnectionStatus = "Connecting to Odoo...";
-                    var odooInfo = await _oDooService.GetCustomerAsync(SunAccountCode);
-
-                    if (odooInfo != null)
+                    try
                     {
-                        Entity.OdooName = odooInfo.PartnerName;
-                        Entity.IsProject = odooInfo.IsProject;
-                        Entity.SunDb = odooInfo.SunDb;
-                        FoundInOdoo = true;
+                        ConnectionStatus = "Connecting to Sun System...";
+                        var sunSystemInfo = await _sunSystemService.GetCustomer(SunAccountCode);
+                        if (sunSystemInfo.HasValue)
+                        {
+                            Entity.AccountName = sunSystemInfo.Value.AccountName;
+                            Entity.Address = sunSystemInfo.Value.Address;
+                            FoundInSunSystem = true;
+
+                        }
+                       
+                      
                     }
+                    catch (ConnectionFailedException sunSystemConnectionException)
+                    {
+                        SunSystemErrorInfo = sunSystemConnectionException.Message;
+                    }
+
+
+                    try
+                    {
+                        ConnectionStatus = "Connecting to Odoo...";
+                        var odooInfo = await _oDooService.GetCustomerAsync(SunAccountCode);
+
+                        if (odooInfo != null)
+                        {
+                            Entity.OdooName = odooInfo.PartnerName;
+                            Entity.IsProject = odooInfo.IsProject;
+                            Entity.SunDb = odooInfo.SunDb;
+                            FoundInOdoo = true;
+                        }
+                    }
+                    catch (ConnectionFailedException odooConnectionException)
+                    {
+                        OdooErrorInfo = odooConnectionException.Message;
+                    }
+
                 }
-                catch (ConnectionFailedException odooConnectionException)
-                {
-                    OdooErrorInfo = odooConnectionException.Message;
-                }
+                
+
+
+
+              
+
+
             }
             finally
             {
@@ -202,24 +224,54 @@ namespace CustomerUpdator.ViewModels
         }
 
 
-        protected bool CanExecuteApply => Entity!=null && Entity.PartnerId>0;
+        protected bool CanExecuteApply => Entity!=null && Entity.PartnerId>0 && !string.IsNullOrWhiteSpace(Entity.SunAccountCode);
 
         #endregion
 
 
-        #region LoadCustomersCommand
+        #region PopulateCustomersCommand
 
-        public AsyncCommand LoadCustomersCommand { get; set; }
+        public AsyncCommand PopulateCustomersCommand { get; set; }
 
 
-        private async Task ExecuteLoadCustomers()
+        private async Task ExecutePopulateCustomers()
         {
             Customers =new ObservableCollection<LookupItem>(await _service.GetCustomersAsync());
         }
 
 
-        protected bool CanExecuteLoadCustomers() => !FoundInAbs;
+        protected bool CanExecutePopulateCustomers() => !FoundInAbs;
 
+        #endregion
+
+        #region LoadCustomerInfoCommand
+
+        public AsyncCommand LoadCustomerInfoCommand { get; set; }
+
+
+        private async Task ExecuteLoadCustomerInfo()
+        {
+            Entity.TaxRegistrationNo = null;
+
+            if(Entity.PartnerId==0) return;
+
+            var item = await _service.GetSunAccountDetail(Entity.PartnerId);
+
+            Entity.TaxRegistrationNo = item.TaxRegistrationNo;
+            if (item.ProjectId.HasValue)
+            {
+                Projects=new ObservableCollection<LookupItem>(){new LookupItem(){Id = item.ProjectId.GetValueOrDefault(),Name = item.ProjectName}};
+                Entity.ProjectId = item.ProjectId;
+            }
+
+            Entity.Accounts = item.Accounts;
+
+        }
+
+
+        protected bool CanExecuteLoadCustomerInfo() => Entity!=null;
+
+        public bool CustomerIsReadOnly => FoundInAbs || LoadCustomerInfoCommand.IsExecuting;
         #endregion
 
         #region UpdateSunAccountCodeCommand
